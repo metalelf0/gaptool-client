@@ -84,6 +84,7 @@ class ChefrunCommand < Clamp::Command
       json = {
         'this_server' => "#{role}-#{environment}-#{node['instance']}",
         'role' => role,
+        'environment' => environment,
         'app_user' => node['appuser'],
         'run_list' => [ "recipe[main]" ],
         'hostname' => node['hostname'],
