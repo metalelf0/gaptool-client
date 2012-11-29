@@ -3,12 +3,16 @@
 require 'rubygems'
 require 'gaptool-api'
 
-require File.expand_path(File.dirname(__FILE__) + "/../lib/gaptool-client.rb")
-
 # Make sure lang isn't fucked
 ENV['LANG'] = "en_US.UTF-8"
 
 # Nuke your ssh-agent
 ENV['SSH_AUTH_SOCK'] = ''
 
+# Make API accessable to client
 $api = GTAPI::GaptoolServer.new(ENV['GT_USER'], ENV['GT_KEY'], ENV['GT_URL'])
+
+# Run client
+require File.expand_path(File.dirname(__FILE__) + "/../lib/gaptool-client.rb")
+
+
