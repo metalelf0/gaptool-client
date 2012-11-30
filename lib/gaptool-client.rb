@@ -28,7 +28,7 @@ class SshCommand < Clamp::Command
   option ["-r", "--role"], "ROLE", "Role name to ssh to", :required => true
   option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => true
   option ["-i", "--instance"], "INSTANCE", "Node instance, leave blank to query avilable nodes", :require => false
-  option ["-f", "--first"], :flag, "Just connect to first available instance", :require => false
+  option ["-f", "--first"], :flag, "Just connect to first available instance"
 
   def execute
     if instance
@@ -91,7 +91,7 @@ class ChefrunCommand < Clamp::Command
         'instance' => node['instance'],
         'zone' => node['zone'],
         'itype' => node['itype'],
-        'apps' => node['apps']
+        'apps' => eval(node['apps'])
       }.to_json
       commands = [
         "cd ~admin/ops; git pull",
@@ -104,7 +104,40 @@ class ChefrunCommand < Clamp::Command
 end
 
 class DeployCommand < Clamp::Command
+  option ["-a", "--app"], "APP", "Application to deploy", :required => true
+  option ["-m", "--migrate"], :flag, "Toggle running migrations"
+  option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => true
+  option ["-b", "--branch"], "BRANCH", "Git branch to deploy, default is master", :required => false
+  option ["-r", "--rollback"], :flag, "Toggle this to rollback last deploy"
 
+  def execute
+    nodes = $api.getappnodes(app, environment)
+    nodes.peach do |node|
+      json = {
+        'this_server' => "#{node['role']}-#{environment}-#{node['instance']}",
+        'role' => node['role'],
+        'environment' => environment,
+        'app_user' => node['appuser'],
+        'run_list' => [ "recipe[deploy]" ],
+        'hostname' => node['hostname'],
+        'instance' => node['instance'],
+        'zone' => node['zone'],
+        'itype' => node['itype'],
+        'apps' => eval(node['apps']),
+        'app_name' => app,
+        'app' => app,
+        'rollback' => rollback?,
+        'branch' => branch || 'master',
+        'migrate' => migrate?
+      }.to_json
+      commands = [
+        "cd ~admin/ops; git pull",
+        "echo '#{json}' > ~admin/solo.json",
+        "sudo chef-solo -c ~admin/ops/cookbooks/solo.rb -j ~admin/solo.json"
+      ]
+      sshcmd(node, commands)
+    end
+  end
 end
 
 class MainCommand < Clamp::Command
