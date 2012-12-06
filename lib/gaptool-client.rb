@@ -11,7 +11,7 @@ class InitCommand < Clamp::Command
   option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => true
   option ["-z", "--zone"], "ZONE", "AWS availability zone to put node in", :required => true
   option ["-t", "--type"], "TYPE", "Type of instance, e.g. m1.large", :required => true
-  option ["-m", "--mirror", "GIGABYTES", "Gigs for raid mirror, must be set up on each node", :required => false
+  option ["-m", "--mirror"], "GIGABYTES", "Gigs for raid mirror, must be set up on each node", :required => false
   def execute
     $api.addnode(zone, type, role, environment, mirror)
   end
@@ -78,9 +78,14 @@ end
 class ChefrunCommand < Clamp::Command
   option ["-r", "--role"], "ROLE", "Role name to ssh to", :required => true
   option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => true
+  option ["-i", "--instance"], "INSTANCE", "Instance ID, e.g. i-12345678", :required => false
 
   def execute
-    nodes = $api.getenvroles(role, environment)
+    if !instance.nil?
+      nodes = [$api.getonenode(role, environment, instance)]
+    else
+      nodes = $api.getenvroles(role, environment)
+    end
     nodes.peach do |node|
       json = {
         'this_server' => "#{role}-#{environment}-#{node['instance']}",
