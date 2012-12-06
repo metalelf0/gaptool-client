@@ -11,8 +11,9 @@ class InitCommand < Clamp::Command
   option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => true
   option ["-z", "--zone"], "ZONE", "AWS availability zone to put node in", :required => true
   option ["-t", "--type"], "TYPE", "Type of instance, e.g. m1.large", :required => true
+  option ["-m", "--mirror", "GIGABYTES", "Gigs for raid mirror, must be set up on each node", :required => false
   def execute
-    $api.addnode(zone, type, role, environment)
+    $api.addnode(zone, type, role, environment, mirror)
   end
 end
 
@@ -140,6 +141,14 @@ class DeployCommand < Clamp::Command
   end
 end
 
+class RegenCommand < Clamp::Command
+  option ["-z", "--zone"], "ZONE", "AWS availability zone to put node in", :required => true
+  def execute
+    nodes = $api.regenhosts(zone)
+  end
+end
+
+
 class MainCommand < Clamp::Command
 
   subcommand "init", "Create new application cluster", InitCommand
@@ -147,6 +156,7 @@ class MainCommand < Clamp::Command
   subcommand "ssh", "ssh to cluster host", SshCommand
   subcommand "chefrun", "chefrun on a resource pool", ChefrunCommand
   subcommand "deploy", "deploy on an application", DeployCommand
+  subcommand "regen", "regen metadata from aws", RegenCommand
 
 end
 
