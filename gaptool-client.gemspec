@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Matt Bailey"]
   s.date = "2012-12-13"
-  s.description = "gaptool client"
+  s.description = "TODO: longer description of your gem"
   s.email = "m@mdb.io"
   s.executables = ["gt"]
   s.extra_rdoc_files = [
@@ -26,6 +26,7 @@ Gem::Specification.new do |s|
     "Rakefile",
     "VERSION",
     "bin/gt",
+    "gaptool-client.gemspec",
     "lib/gaptool-client.rb",
     "test/helper.rb",
     "test/test_gaptool-client.rb"
@@ -34,7 +35,7 @@ Gem::Specification.new do |s|
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
   s.rubygems_version = "1.8.23"
-  s.summary = "gaptool client for gaptool-server and gaptool-api"
+  s.summary = "TODO: one-line summary of your gem"
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
