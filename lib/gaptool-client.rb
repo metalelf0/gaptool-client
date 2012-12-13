@@ -153,6 +153,47 @@ class RegenCommand < Clamp::Command
   end
 end
 
+class BalanceCommand < Clamp::Command
+  option ["-r", "--role"], "ROLE", "Role name to ssh to", :required => true
+  option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => true
+  def execute
+    balance = $api.balanceservices(role, environment)
+  end
+  puts balance
+end
+
+class AddserviceCommand < Clamp::Command
+  option ["-r", "--role"], "ROLE", "Role name to ssh to", :required => true
+  option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => true
+  option ["-n", "--name"], "NAME", "Name of the service, e.g. 'twitter'. MUST MATCH UPSTARTD SERVICE NAME.", :required => true
+  option ["-w", "--weight"], "WEIGHT", "Relative service weight, for the balancer to chose run location", :required => true
+  option ["-y", "--enabled"], :flag "Enable this service in balance run"
+  option ["-k", "--keys"], "KEYS", "Hash of keys that will be written to YAML /tmp/apikeys-<service name>.yml. This will be eval()'d, write it like a ruby hash.", :required => true
+  def execute
+    if enabled?
+      en = 1
+    else
+      en = 0
+    end
+    servicecount = $api.addservice(role, environment, name, eval(keys), weight, en)
+  end
+  puts servicecount
+end
+
+class DelserviceCommand < Clamp::Command
+  option ["-r", "--role"], "ROLE", "Role name to ssh to", :required => true
+  option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => true
+  option ["-n", "--name"], "NAME", "Name of the service, e.g. 'twitter'. MUST MATCH UPSTARTD SERVICE NAME.", :required => true
+  def execute
+    puts $api.deleteservice(role, environment, name)
+  end
+end
+
+class ServicesCommand < Clamp::Command
+  def execute
+    puts $api.getservices()
+  end
+end
 
 class MainCommand < Clamp::Command
 
@@ -162,6 +203,10 @@ class MainCommand < Clamp::Command
   subcommand "chefrun", "chefrun on a resource pool", ChefrunCommand
   subcommand "deploy", "deploy on an application", DeployCommand
   subcommand "regen", "regen metadata from aws", RegenCommand
+  subcommand "balance", "balance services across nodes based on weight", BalanceCommand
+  subcommand "addservice", "add new service to service framework", AddserviceCommand
+  subcommand "delservice", "delete last service", DelserviceCommand
+  subcommand "services", "show all services", ServicesCommand
 
 end
 
