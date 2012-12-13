@@ -157,9 +157,8 @@ class BalanceCommand < Clamp::Command
   option ["-r", "--role"], "ROLE", "Role name to ssh to", :required => true
   option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => true
   def execute
-    balance = $api.balanceservices(role, environment)
+    puts $api.balanceservices(role, environment)
   end
-  puts balance
 end
 
 class AddserviceCommand < Clamp::Command
@@ -167,7 +166,7 @@ class AddserviceCommand < Clamp::Command
   option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => true
   option ["-n", "--name"], "NAME", "Name of the service, e.g. 'twitter'. MUST MATCH UPSTARTD SERVICE NAME.", :required => true
   option ["-w", "--weight"], "WEIGHT", "Relative service weight, for the balancer to chose run location", :required => true
-  option ["-y", "--enabled"], :flag "Enable this service in balance run"
+  option ["-y", "--enabled"], :flag, "Enable this service in balance run"
   option ["-k", "--keys"], "KEYS", "Hash of keys that will be written to YAML /tmp/apikeys-<service name>.yml. This will be eval()'d, write it like a ruby hash.", :required => true
   def execute
     if enabled?
@@ -175,9 +174,8 @@ class AddserviceCommand < Clamp::Command
     else
       en = 0
     end
-    servicecount = $api.addservice(role, environment, name, eval(keys), weight, en)
+    puts $api.addservice(role, environment, name, eval(keys), weight, en)
   end
-  puts servicecount
 end
 
 class DelserviceCommand < Clamp::Command
