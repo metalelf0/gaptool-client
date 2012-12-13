@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "gaptool-client"
   gem.homepage = "http://github.com/mattbailey/gaptool-client"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{gaptool client}
+  gem.description = %Q{client for gaptool-server}
   gem.email = "m@mdb.io"
   gem.authors = ["Matt Bailey"]
   # dependencies defined in Gemfile
