@@ -57,7 +57,7 @@ class SshCommand < Clamp::Command
 end
 
 class InfoCommand < Clamp::Command
-  option ["-r", "--role"], "ROLE", "Role name to ssh to", :required => false
+  option ["-r", "--role"], "ROLE", "Role name, e.g. frontend", :required => false
   option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => false
   option ["-i", "--instance"], "INSTANCE", "Node instance, leave blank to query avilable nodes", :required => false
   option ["-p", "--parseable"], :flag, "Display in non-pretty parseable JSON"
