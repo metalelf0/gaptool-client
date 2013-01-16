@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# coding: utf-8
 require 'rainbow'
 require 'peach'
 require 'json'
@@ -55,6 +56,54 @@ class SshCommand < Clamp::Command
 
 end
 
+class InfoCommand < Clamp::Command
+  option ["-r", "--role"], "ROLE", "Role name to ssh to", :required => false
+  option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => false
+  option ["-i", "--instance"], "INSTANCE", "Node instance, leave blank to query avilable nodes", :required => false
+  option ["-p", "--parseable"], :flag, "Display in non-pretty parseable JSON"
+  option ["-g", "--grepable"], :flag, "Display in non-pretty grep-friendly text"
+
+  def execute
+    @nodes = Array.new
+    if instance
+      @nodes = [$api.getonenode(instance)]
+    elsif role && environment
+      @nodes = $api.getenvroles(role, environment)
+    elsif role && !environment
+      @nodes = $api.getrolenodes(role)
+    else
+      @nodes = $api.getallnodes()
+    end
+    infohelper(@nodes, parseable?, grepable?)
+  end
+
+
+end
+
+def infohelper(nodes, parseable, grepable)
+  if parseable
+    puts nodes.to_json
+  else
+    nodes.each do |node|
+      @host = "#{node['role']}:#{node['environment']}:#{node['instance']}"
+      unless grepable
+        puts @host.color(:green)
+      end
+      node.keys.each do |key|
+        if grepable
+          puts "#{@host}|#{key}|#{node[key]}"
+        else
+          unless key == node.keys.last
+            puts "  ┠  #{key.color(:cyan)}: #{node[key]}"
+          else
+            puts "  ┖  #{key.color(:cyan)}: #{node[key]}\n\n"
+          end
+        end
+      end
+    end
+  end
+end
+
 def sshcmd(node, commands)
   Net::SSH.start(
     node['hostname'],
@@ -82,7 +131,7 @@ class ChefrunCommand < Clamp::Command
 
   def execute
     if !instance.nil?
-      nodes = [$api.getonenode(role, environment, instance)]
+      nodes = [$api.getonenode(instance)]
     else
       nodes = $api.getenvroles(role, environment)
     end
@@ -195,6 +244,7 @@ end
 
 class MainCommand < Clamp::Command
 
+  subcommand "info", "Displays information about nodes", InfoCommand
   subcommand "init", "Create new application cluster", InitCommand
   subcommand "terminate", "Terminate instance", TerminateCommand
   subcommand "ssh", "ssh to cluster host", SshCommand
