@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "gaptool-client"
-  s.version = "0.1.0"
+  s.version = "0.2.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Matt Bailey"]
-  s.date = "2012-12-13"
+  s.date = "2013-01-16"
   s.description = "client for gaptool-server"
   s.email = "m@mdb.io"
   s.executables = ["gt"]
