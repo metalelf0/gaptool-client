@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# coding: utf-8
 require 'rainbow'
 require 'peach'
 require 'json'
@@ -63,6 +64,54 @@ class SshCommand < Clamp::Command
   end
 end
 
+class InfoCommand < Clamp::Command
+  option ["-r", "--role"], "ROLE", "Role name, e.g. frontend", :required => false
+  option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => false
+  option ["-i", "--instance"], "INSTANCE", "Node instance, leave blank to query avilable nodes", :required => false
+  option ["-p", "--parseable"], :flag, "Display in non-pretty parseable JSON"
+  option ["-g", "--grepable"], :flag, "Display in non-pretty grep-friendly text"
+
+  def execute
+    @nodes = Array.new
+    if instance
+      @nodes = [$api.getonenode(instance)]
+    elsif role && environment
+      @nodes = $api.getenvroles(role, environment)
+    elsif role && !environment
+      @nodes = $api.getrolenodes(role)
+    else
+      @nodes = $api.getallnodes()
+    end
+    infohelper(@nodes, parseable?, grepable?)
+  end
+
+
+end
+
+def infohelper(nodes, parseable, grepable)
+  if parseable
+    puts nodes.to_json
+  else
+    nodes.each do |node|
+      @host = "#{node['role']}:#{node['environment']}:#{node['instance']}"
+      unless grepable
+        puts @host.color(:green)
+      end
+      node.keys.each do |key|
+        if grepable
+          puts "#{@host}|#{key}|#{node[key]}"
+        else
+          unless key == node.keys.last
+            puts "  ┠  #{key.color(:cyan)}: #{node[key]}"
+          else
+            puts "  ┖  #{key.color(:cyan)}: #{node[key]}\n\n"
+          end
+        end
+      end
+    end
+  end
+end
+
 def sshcmd(node, commands)
   Net::SSH.start(
     node['hostname'],
@@ -90,7 +139,7 @@ class ChefrunCommand < Clamp::Command
 
   def execute
     if !instance.nil?
-      nodes = [$api.getonenode(role, environment, instance)]
+      nodes = [$api.getonenode(instance)]
     else
       nodes = $api.getenvroles(role, environment)
     end
@@ -161,15 +210,59 @@ class RegenCommand < Clamp::Command
   end
 end
 
+class BalanceCommand < Clamp::Command
+  option ["-r", "--role"], "ROLE", "Role name to ssh to", :required => true
+  option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => true
+  def execute
+    puts $api.balanceservices(role, environment)
+  end
+end
+
+class AddserviceCommand < Clamp::Command
+  option ["-r", "--role"], "ROLE", "Role name to ssh to", :required => true
+  option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => true
+  option ["-n", "--name"], "NAME", "Name of the service, e.g. 'twitter'. MUST MATCH UPSTARTD SERVICE NAME.", :required => true
+  option ["-w", "--weight"], "WEIGHT", "Relative service weight, for the balancer to chose run location", :required => true
+  option ["-y", "--enabled"], :flag, "Enable this service in balance run"
+  option ["-k", "--keys"], "KEYS", "Hash of keys that will be written to YAML /tmp/apikeys-<service name>.yml. This will be eval()'d, write it like a ruby hash.", :required => true
+  def execute
+    if enabled?
+      en = 1
+    else
+      en = 0
+    end
+    puts $api.addservice(role, environment, name, eval(keys), weight, en)
+  end
+end
+
+class DelserviceCommand < Clamp::Command
+  option ["-r", "--role"], "ROLE", "Role name to ssh to", :required => true
+  option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => true
+  option ["-n", "--name"], "NAME", "Name of the service, e.g. 'twitter'. MUST MATCH UPSTARTD SERVICE NAME.", :required => true
+  def execute
+    puts $api.deleteservice(role, environment, name)
+  end
+end
+
+class ServicesCommand < Clamp::Command
+  def execute
+    puts $api.getservices()
+  end
+end
 
 class MainCommand < Clamp::Command
 
+  subcommand "info", "Displays information about nodes", InfoCommand
   subcommand "init", "Create new application cluster", InitCommand
   subcommand "terminate", "Terminate instance", TerminateCommand
   subcommand "ssh", "ssh to cluster host", SshCommand
   subcommand "chefrun", "chefrun on a resource pool", ChefrunCommand
   subcommand "deploy", "deploy on an application", DeployCommand
   subcommand "regen", "regen metadata from aws", RegenCommand
+  subcommand "balance", "balance services across nodes based on weight", BalanceCommand
+  subcommand "addservice", "add new service to service framework", AddserviceCommand
+  subcommand "delservice", "delete last service", DelserviceCommand
+  subcommand "services", "show all services", ServicesCommand
 
 end
 
