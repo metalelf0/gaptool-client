@@ -17,4 +17,4 @@ gem 'json'
 gem 'peach'
 gem 'rainbow'
 gem 'clamp'
-gem 'gaptool-api'
+gem 'gaptool-api', ">= 0.3.2"
