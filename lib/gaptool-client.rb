@@ -247,9 +247,25 @@ module Gaptool
     option [ "-s", "--service"], "SERVICE", "Name of the service, omit to show all"
     def execute
       if service.nil?
-        puts $api.svcapi_showkeys(:all)
+        keyhash = $api.svcapi_showkeys(:all)
+        keyhash.keys.each do |service|
+          puts service.color(:green)
+          keyhash[service].keys.each do |state|
+            puts "  ┖  #{state}".color(:cyan)
+            keyhash[service][state].each do |key|
+              puts "    - #{key}"
+            end
+          end
+        end
       else
-        puts $api.svcapi_showkeys(service)
+        keyhash = $api.svcapi_showkeys(service)
+        puts service.color(:green)
+        keyhash.keys.each do |state|
+          puts "  ┖  #{state}".color(:cyan)
+          keyhash[state].each do |key|
+            puts "    - #{key}"
+          end
+        end
       end
     end
   end
