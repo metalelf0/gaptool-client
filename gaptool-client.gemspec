@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Matt Bailey"]
-  s.date = "2013-01-16"
+  s.date = "2013-02-06"
   s.description = "client for gaptool-server"
   s.email = "m@mdb.io"
   s.executables = ["gt"]
@@ -45,7 +45,7 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<peach>, [">= 0"])
       s.add_runtime_dependency(%q<rainbow>, [">= 0"])
       s.add_runtime_dependency(%q<clamp>, [">= 0"])
-      s.add_runtime_dependency(%q<gaptool-api>, [">= 0"])
+      s.add_runtime_dependency(%q<gaptool-api>, [">= 0.3.2"])
       s.add_development_dependency(%q<shoulda>, [">= 0"])
       s.add_development_dependency(%q<rdoc>, [">= 0"])
       s.add_development_dependency(%q<bundler>, [">= 0"])
@@ -56,7 +56,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<peach>, [">= 0"])
       s.add_dependency(%q<rainbow>, [">= 0"])
       s.add_dependency(%q<clamp>, [">= 0"])
-      s.add_dependency(%q<gaptool-api>, [">= 0"])
+      s.add_dependency(%q<gaptool-api>, [">= 0.3.2"])
       s.add_dependency(%q<shoulda>, [">= 0"])
       s.add_dependency(%q<rdoc>, [">= 0"])
       s.add_dependency(%q<bundler>, [">= 0"])
@@ -68,7 +68,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<peach>, [">= 0"])
     s.add_dependency(%q<rainbow>, [">= 0"])
     s.add_dependency(%q<clamp>, [">= 0"])
-    s.add_dependency(%q<gaptool-api>, [">= 0"])
+    s.add_dependency(%q<gaptool-api>, [">= 0.3.2"])
     s.add_dependency(%q<shoulda>, [">= 0"])
     s.add_dependency(%q<rdoc>, [">= 0"])
     s.add_dependency(%q<bundler>, [">= 0"])
