@@ -9,7 +9,11 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Matt Bailey"]
+<<<<<<< HEAD
   s.date = "2013-02-06"
+=======
+  s.date = "2013-01-17"
+>>>>>>> d877885dfb4520e25ac81ed1bb1290c8e0034cb6
   s.description = "client for gaptool-server"
   s.email = "m@mdb.io"
   s.executables = ["gt"]

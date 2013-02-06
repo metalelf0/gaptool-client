@@ -27,6 +27,7 @@ module Gaptool
     end
   end
 
+<<<<<<< HEAD
   class SshCommand < Clamp::Command
     option ["-r", "--role"], "ROLE", "Role name to ssh to", :required => true
     option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => true
@@ -34,6 +35,32 @@ module Gaptool
     option ["-f", "--first"], :flag, "Just connect to first available instance"
 
     def execute
+=======
+class SshCommand < Clamp::Command
+  option ["-r", "--role"], "ROLE", "Role name to ssh to", :required => true
+  option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => true
+  option ["-i", "--instance"], "INSTANCE", "Node instance, leave blank to query avilable nodes", :require => false
+  option ["-f", "--first"], :flag, "Just connect to first available instance"
+  option ["-t", "--tmux"], :flag, "Open cluster in windows in a tmux session"
+
+  def execute
+    if tmux?
+      nodes = $api.getenvroles(role, environment)
+      system "tmux start-server"
+      nodes.each_index do |i|
+        @ssh = $api.ssh(role, environment, nodes[i]['instance'])
+        if i == 0
+          system "tmux new-session -d -s #{role}-#{environment} -n #{nodes[i]['instance']}"
+        else
+          system "tmux new-window -t #{role}-#{environment}:#{i} -n #{nodes[i]['instance']}"
+        end
+        File.open("/tmp/gtkey-#{nodes[i]['instance']}", 'w') {|f| f.write(@ssh['key'])}
+        File.chmod(0600, "/tmp/gtkey-#{nodes[i]['instance']}")
+        system "tmux send-keys -t #{role}-#{environment}:#{i} 'SSH_AUTH_SOCK=\"\" ssh -i /tmp/gtkey-#{nodes[i]['instance']} admin@#{@ssh['hostname']}' C-m"
+      end
+      system "tmux attach -t #{role}-#{environment}"
+    else
+>>>>>>> d877885dfb4520e25ac81ed1bb1290c8e0034cb6
       if instance
         @ssh = $api.ssh(role, environment, instance)
       else
@@ -54,8 +81,13 @@ module Gaptool
       File.chmod(0600, '/tmp/gtkey')
       system "SSH_AUTH_SOCK='' ssh -i /tmp/gtkey admin@#{@ssh['hostname']}"
     end
+<<<<<<< HEAD
 
   end
+=======
+  end
+end
+>>>>>>> d877885dfb4520e25ac81ed1bb1290c8e0034cb6
 
   class InfoCommand < Clamp::Command
     option ["-r", "--role"], "ROLE", "Role name, e.g. frontend", :required => false
