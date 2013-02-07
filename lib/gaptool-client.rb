@@ -274,7 +274,9 @@ module Gaptool
     option [ "-s", "--service"], "SERVICE", "Name of the service", :required => true
     option [ "-k", "--key" ], "KEY", "string for storing as a key/deleting", :required => true
     def execute
-      $api.svcapi_deletekey(service, key)
+      if $api.svcapi_deletekey(service, key)
+        puts "success"
+      end
     end
   end
 
@@ -282,7 +284,7 @@ module Gaptool
     option [ "-s", "--service"], "SERVICE", "Name of the service", :required => true
     option [ "-k", "--key" ], "KEY", "string for storing as a key/deleting", :required => true
     def execute
-      $api.svcapi_putkey(service, key)
+      puts $api.svcapi_putkey(service, key)
     end
   end
 
