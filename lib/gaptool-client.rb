@@ -7,6 +7,49 @@ require 'clamp'
 require 'net/ssh'
 require 'net/scp'
 
+def infohelper(nodes, parseable, grepable)
+  if parseable
+    puts nodes.to_json
+  else
+    nodes.each do |node|
+      @host = "#{node['role']}:#{node['environment']}:#{node['instance']}"
+      unless grepable
+        puts @host.color(:green)
+      end
+      node.keys.each do |key|
+        if grepable
+          puts "#{@host}|#{key}|#{node[key]}"
+        else
+          unless key == node.keys.last
+            puts "  ┠  #{key.color(:cyan)}: #{node[key]}"
+          else
+            puts "  ┖  #{key.color(:cyan)}: #{node[key]}\n\n"
+          end
+        end
+      end
+    end
+  end
+end
+
+def sshcmd(node, commands)
+  Net::SSH.start(
+    node['hostname'],
+    'admin',
+    :key_data => [$api.ssh(node['role'], node['environment'], node['instance'])['key']],
+    :config => false,
+    :keys_only => true,
+    :paranoid => false
+  ) do |ssh|
+    commands.each do |command|
+      command.color(:cyan)
+      ssh.exec! command do
+        |ch, stream, line|
+        puts "#{node['role'].color(:yellow)}:#{node['environment'].color(:yellow)}:#{node['instance'].color(:yellow)}> #{line}"
+      end
+    end
+  end
+end
+
 module Gaptool
   class InitCommand < Clamp::Command
     option ["-r", "--role"], "ROLE", "Resource name to initilize", :required => true
@@ -77,53 +120,7 @@ module Gaptool
       end
       infohelper(@nodes, parseable?, grepable?)
     end
-
-
   end
-
-  def infohelper(nodes, parseable, grepable)
-    if parseable
-      puts nodes.to_json
-    else
-      nodes.each do |node|
-        @host = "#{node['role']}:#{node['environment']}:#{node['instance']}"
-        unless grepable
-          puts @host.color(:green)
-        end
-        node.keys.each do |key|
-          if grepable
-            puts "#{@host}|#{key}|#{node[key]}"
-          else
-            unless key == node.keys.last
-              puts "  ┠  #{key.color(:cyan)}: #{node[key]}"
-            else
-              puts "  ┖  #{key.color(:cyan)}: #{node[key]}\n\n"
-            end
-          end
-        end
-      end
-    end
-  end
-
-  def sshcmd(node, commands)
-    Net::SSH.start(
-      node['hostname'],
-      'admin',
-      :key_data => [$api.ssh(node['role'], node['environment'], node['instance'])['key']],
-      :config => false,
-      :keys_only => true,
-      :paranoid => false
-    ) do |ssh|
-      commands.each do |command|
-        command.color(:cyan)
-        ssh.exec! command do
-          |ch, stream, line|
-          puts "#{node['role'].color(:yellow)}:#{node['environment'].color(:yellow)}:#{node['instance'].color(:yellow)}> #{line}"
-        end
-      end
-    end
-  end
-
 
   class ChefrunCommand < Clamp::Command
     option ["-r", "--role"], "ROLE", "Role name to ssh to", :required => true
