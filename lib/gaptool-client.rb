@@ -75,27 +75,45 @@ module Gaptool
     option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => true
     option ["-i", "--instance"], "INSTANCE", "Node instance, leave blank to query avilable nodes", :require => false
     option ["-f", "--first"], :flag, "Just connect to first available instance"
+    option ["-t", "--tmux"], :flag, "Open cluster in windows in a tmux session"
 
     def execute
-      if instance
-        @ssh = $api.ssh(role, environment, instance)
-      else
+      if tmux?
         nodes = $api.getenvroles(role, environment)
-        if first? || nodes.size == 1
-          puts "No instnace specified, but only one instance in cluster or first forced"
-          @ssh = $api.ssh(role, environment, nodes.first['instance'])
-        else
-          puts "No instance specified, querying list."
-          nodes.each_index do |i|
-            puts "#{i}: #{nodes[i]['instance']}"
+        system "tmux start-server"
+        nodes.each_index do |i|
+          @ssh = $api.ssh(role, environment, nodes[i]['instance'])
+          if i == 0
+            system "tmux new-session -d -s #{role}-#{environment} -n #{nodes[i]['instance']}"
+          else
+            system "tmux new-window -t #{role}-#{environment}:#{i} -n #{nodes[i]['instance']}"
           end
-          print "Select a node: ".color(:cyan)
-          @ssh = $api.ssh(role, environment, nodes[$stdin.gets.chomp.to_i]['instance'])
+          File.open("/tmp/gtkey-#{nodes[i]['instance']}", 'w') {|f| f.write(@ssh['key'])}
+          File.chmod(0600, "/tmp/gtkey-#{nodes[i]['instance']}")
+          system "tmux send-keys -t #{role}-#{environment}:#{i} 'SSH_AUTH_SOCK=\"\" ssh -i /tmp/gtkey-#{nodes[i]['instance']} admin@#{@ssh['hostname']}' C-m"
         end
+        system "tmux attach -t #{role}-#{environment}"
+      else
+        if instance
+          @ssh = $api.ssh(role, environment, instance)
+        else
+          nodes = $api.getenvroles(role, environment)
+          if first? || nodes.size == 1
+            puts "No instnace specified, but only one instance in cluster or first forced"
+            @ssh = $api.ssh(role, environment, nodes.first['instance'])
+          else
+            puts "No instance specified, querying list."
+            nodes.each_index do |i|
+              puts "#{i}: #{nodes[i]['instance']}"
+            end
+            print "Select a node: ".color(:cyan)
+            @ssh = $api.ssh(role, environment, nodes[$stdin.gets.chomp.to_i]['instance'])
+          end
+        end
+        File.open('/tmp/gtkey', 'w') {|f| f.write(@ssh['key'])}
+        File.chmod(0600, '/tmp/gtkey')
+        system "SSH_AUTH_SOCK='' ssh -i /tmp/gtkey admin@#{@ssh['hostname']}"
       end
-      File.open('/tmp/gtkey', 'w') {|f| f.write(@ssh['key'])}
-      File.chmod(0600, '/tmp/gtkey')
-      system "SSH_AUTH_SOCK='' ssh -i /tmp/gtkey admin@#{@ssh['hostname']}"
     end
 
   end
