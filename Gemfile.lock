@@ -6,6 +6,7 @@ GEM
       multi_json (~> 1.0)
     bourne (1.1.2)
       mocha (= 0.10.5)
+    builder (3.2.0)
     clamp (0.5.1)
     gaptool-api (0.3.2)
       httparty
@@ -48,6 +49,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  builder
   bundler
   clamp
   gaptool-api (>= 0.3.2)
