@@ -40,15 +40,47 @@ def sshcmd(node, commands)
     :keys_only => true,
     :paranoid => false
   ) do |ssh|
+    stdout_data = ""
+    stderr_data = ""
+    exit_code = nil
+    exit_signal = nil
     commands.each do |command|
-      command.color(:cyan)
-      ssh.exec! command do
-        |ch, stream, line|
-        puts "#{node['role'].color(:yellow)}:#{node['environment'].color(:yellow)}:#{node['instance'].color(:yellow)}> #{line}"
+      ssh.open_channel do |channel|
+        channel.exec(command) do |ch, success|
+          unless success
+            abort "FAILED: couldn't execute command (ssh.channel.exec)"
+          end
+          channel.on_data do |ch,data|
+            puts "#{node['role'].color(:yellow)}:#{node['environment'].color(:yellow)}:#{node['instance'].color(:yellow)}> #{data}"
+          end
+
+          channel.on_extended_data do |ch,type,data|
+            puts "#{node['role'].color(:yellow)}:#{node['environment'].color(:yellow)}:#{node['instance'].color(:red)}> #{data}"
+          end
+
+          channel.on_request("exit-status") do |ch,data|
+            exit_code = data.read_long
+            if exit_code != 0
+              exit exit_code
+            end
+          end
+
+          channel.on_request("exit-signal") do |ch, data|
+            exit_signal = data.read_string
+          end
+        end
       end
     end
+#    ssh.loop
+#    [stdout_data, stderr_data, exit_code, exit_signal]
   end
 end
+
+#def sshcmd(node, commands)
+#  commands.each do |command|
+#    ssh_exec!(node, command)
+#  end
+#end
 
 module Gaptool
   class InitCommand < Clamp::Command
