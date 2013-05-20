@@ -212,9 +212,14 @@ module Gaptool
     option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => true
     option ["-b", "--branch"], "BRANCH", "Git branch to deploy, default is master", :required => false
     option ["-r", "--rollback"], :flag, "Toggle this to rollback last deploy"
+    option ["-i", "--instance"], "INSTANCE", "Instance ID, e.g. i-12345678", :required => false
 
     def execute
-      nodes = $api.getappnodes(app, environment)
+      if instance
+        nodes = [$api.getonenode(instance)]
+      else
+        nodes = $api.getappnodes(app, environment)
+      end
       nodes.peach do |node|
         json = {
           'this_server' => "#{node['role']}-#{environment}-#{node['instance']}",
