@@ -6,7 +6,7 @@ GEM
       multi_json (~> 1.0)
     builder (3.2.0)
     clamp (0.6.1)
-    gaptool-api (0.3.3)
+    gaptool-api (0.3.5)
       httparty
     git (1.2.5)
     httparty (0.11.0)
@@ -47,7 +47,7 @@ DEPENDENCIES
   builder
   bundler
   clamp
-  gaptool-api (>= 0.3.2)
+  gaptool-api (>= 0.3.5)
   jeweler (~> 1.8.4)
   json
   net-scp

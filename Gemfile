@@ -19,5 +19,5 @@ gem 'rainbow'
 gem 'clamp'
 gem 'net-ssh'
 gem 'net-scp'
-gem 'gaptool-api', ">= 0.3.2"
+gem 'gaptool-api', ">= 0.3.5"
 gem 'builder'
