@@ -248,10 +248,14 @@ module Gaptool
     end
   end
 
-  class RegenCommand < Clamp::Command
-    option ["-z", "--zone"], "ZONE", "AWS availability zone to put node in", :required => true
+  class RehashCommand < Clamp::Command
+    option ["-y", "--yes"], :flag, "YES I REALLY WANT TO DO THIS"
     def execute
-      nodes = $api.regenhosts(zone)
+      if yes?
+        puts $api.rehash()
+      else
+        puts "You need to run this with -y\nIf you don't know what this does or aren't sure, DO NOT RUN IT\nThis will regenerate all host metadata on gaptool-server\nand can break in-progress operations."
+      end
     end
   end
 
@@ -354,12 +358,12 @@ module Gaptool
     subcommand "ssh", "ssh to cluster host", SshCommand
     subcommand "chefrun", "chefrun on a resource pool", ChefrunCommand
     subcommand "deploy", "deploy on an application", DeployCommand
-    subcommand "regen", "regen metadata from aws", RegenCommand
     subcommand "balance", "balance services across nodes based on weight", BalanceCommand
     subcommand "addservice", "add new service to service framework", AddserviceCommand
     subcommand "delservice", "delete last service", DelserviceCommand
     subcommand "services", "show all services", ServicesCommand
     subcommand "svcapi", "manipulate service API keys/metadata", SvcAPI
+    subcommand "rehash", "Regenerate all host metadata. KNOW WHAT THIS DOES BEFORE RUNNING IT", RehashCommand
 
   end
 end
