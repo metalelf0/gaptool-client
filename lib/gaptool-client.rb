@@ -102,6 +102,24 @@ module Gaptool
     end
   end
 
+  class RuncmdCommand < Clamp::Command
+    option ["-r", "--role"], "ROLE", "Role name to ssh to", :required => true
+    option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => true
+    option ["-i", "--instance"], "INSTANCE", "Instance ID, e.g. i-12345678", :required => false
+    option ["-c", "--command"], "COMMAND", "Command to run", :required => true
+    def execute
+      if !instance.nil?
+        nodes = [$api.getonenode(instance)]
+      else
+        nodes = $api.getenvroles(role, environment)
+      end
+      nodes.peach do |node|
+        commands = [ command ]
+        sshcmd(node, commands)
+      end
+    end
+  end
+
   class SshCommand < Clamp::Command
     option ["-r", "--role"], "ROLE", "Role name to ssh to", :required => true
     option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => true
@@ -364,6 +382,7 @@ module Gaptool
     subcommand "services", "show all services", ServicesCommand
     subcommand "svcapi", "manipulate service API keys/metadata", SvcAPI
     subcommand "rehash", "Regenerate all host metadata. KNOW WHAT THIS DOES BEFORE RUNNING IT", RehashCommand
+    subcommand "runcmd", "Run command on instance", RuncmdCommand
 
   end
 end
