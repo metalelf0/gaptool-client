@@ -16,7 +16,7 @@ end
 gem 'json'
 gem 'peach'
 gem 'rainbow'
-gem 'clamp'
+gem 'clamp', '>= 0.6.1'
 gem 'net-ssh'
 gem 'net-scp'
 gem 'gaptool-api', ">= 0.3.5"

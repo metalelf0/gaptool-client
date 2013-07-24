@@ -106,7 +106,7 @@ module Gaptool
     option ["-r", "--role"], "ROLE", "Role name to ssh to", :required => true
     option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => true
     option ["-i", "--instance"], "INSTANCE", "Instance ID, e.g. i-12345678", :required => false
-    option ["-c", "--command"], "COMMAND", "Command to run", :required => true
+    option ["-c", "--command"], "COMMAND", "Command to run", :required => true, :multivalued => true
     def execute
       if !instance.nil?
         nodes = [$api.getonenode(instance)]
