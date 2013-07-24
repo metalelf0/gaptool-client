@@ -46,7 +46,7 @@ PLATFORMS
 DEPENDENCIES
   builder
   bundler
-  clamp
+  clamp (>= 0.6.1)
   gaptool-api (>= 0.3.5)
   jeweler (~> 1.8.4)
   json
