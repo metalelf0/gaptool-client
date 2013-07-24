@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "gaptool-client"
-  s.version = "0.5.0"
+  s.version = "0.5.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Matt Bailey"]
-  s.date = "2013-07-23"
+  s.date = "2013-07-24"
   s.description = "client for gaptool-server"
   s.email = "m@mdb.io"
   s.executables = ["gt"]
@@ -44,7 +44,7 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<json>, [">= 0"])
       s.add_runtime_dependency(%q<peach>, [">= 0"])
       s.add_runtime_dependency(%q<rainbow>, [">= 0"])
-      s.add_runtime_dependency(%q<clamp>, [">= 0"])
+      s.add_runtime_dependency(%q<clamp>, [">= 0.6.1"])
       s.add_runtime_dependency(%q<net-ssh>, [">= 0"])
       s.add_runtime_dependency(%q<net-scp>, [">= 0"])
       s.add_runtime_dependency(%q<gaptool-api>, [">= 0.3.5"])
@@ -58,7 +58,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<json>, [">= 0"])
       s.add_dependency(%q<peach>, [">= 0"])
       s.add_dependency(%q<rainbow>, [">= 0"])
-      s.add_dependency(%q<clamp>, [">= 0"])
+      s.add_dependency(%q<clamp>, [">= 0.6.1"])
       s.add_dependency(%q<net-ssh>, [">= 0"])
       s.add_dependency(%q<net-scp>, [">= 0"])
       s.add_dependency(%q<gaptool-api>, [">= 0.3.5"])
@@ -73,7 +73,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<json>, [">= 0"])
     s.add_dependency(%q<peach>, [">= 0"])
     s.add_dependency(%q<rainbow>, [">= 0"])
-    s.add_dependency(%q<clamp>, [">= 0"])
+    s.add_dependency(%q<clamp>, [">= 0.6.1"])
     s.add_dependency(%q<net-ssh>, [">= 0"])
     s.add_dependency(%q<net-scp>, [">= 0"])
     s.add_dependency(%q<gaptool-api>, [">= 0.3.5"])
