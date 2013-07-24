@@ -71,16 +71,8 @@ def sshcmd(node, commands)
         end
       end
     end
-#    ssh.loop
-#    [stdout_data, stderr_data, exit_code, exit_signal]
   end
 end
-
-#def sshcmd(node, commands)
-#  commands.each do |command|
-#    ssh_exec!(node, command)
-#  end
-#end
 
 module Gaptool
   class InitCommand < Clamp::Command
@@ -106,7 +98,7 @@ module Gaptool
     option ["-r", "--role"], "ROLE", "Role name to ssh to", :required => true
     option ["-e", "--environment"], "ENVIRONMENT", "Which environment, e.g. production", :required => true
     option ["-i", "--instance"], "INSTANCE", "Instance ID, e.g. i-12345678", :required => false
-    option ["-c", "--command"], "COMMAND", "Command to run", :required => true, :multivalued => true
+    parameter "COMMAND ...", "Command to run", :attribute_name => :command
     def execute
       if !instance.nil?
         nodes = [$api.getonenode(instance)]
@@ -114,7 +106,7 @@ module Gaptool
         nodes = $api.getenvroles(role, environment)
       end
       nodes.peach do |node|
-        commands = [ command ]
+        commands = [ command.join(' ') ]
         sshcmd(node, commands)
       end
     end
