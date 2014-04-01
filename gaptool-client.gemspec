@@ -43,7 +43,7 @@ Gem::Specification.new do |s|
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<json>, [">= 0"])
       s.add_runtime_dependency(%q<peach>, [">= 0"])
-      s.add_runtime_dependency(%q<rainbow>, [">= 0"])
+      s.add_runtime_dependency(%q<rainbow>, ["~> 2.0"])
       s.add_runtime_dependency(%q<clamp>, [">= 0.6.1"])
       s.add_runtime_dependency(%q<net-ssh>, [">= 0"])
       s.add_runtime_dependency(%q<net-scp>, [">= 0"])

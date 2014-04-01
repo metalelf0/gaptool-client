@@ -14,16 +14,16 @@ def infohelper(nodes, parseable, grepable)
     nodes.each do |node|
       @host = "#{node['role']}:#{node['environment']}:#{node['instance']}"
       unless grepable
-        puts @host.color(:green)
+        puts Rainbow(@host).green
       end
       node.keys.each do |key|
         if grepable
           puts "#{@host}|#{key}|#{node[key]}"
         else
           unless key == node.keys.last
-            puts "  ┠  #{key.color(:cyan)}: #{node[key]}"
+            puts "  ┠  #{Rainbow(key).cyan}: #{node[key]}"
           else
-            puts "  ┖  #{key.color(:cyan)}: #{node[key]}\n\n"
+            puts "  ┖  #{Rainbow(key).cyan}: #{node[key]}\n\n"
           end
         end
       end
@@ -51,11 +51,11 @@ def sshcmd(node, commands)
             abort "FAILED: couldn't execute command (ssh.channel.exec)"
           end
           channel.on_data do |ch,data|
-            puts "#{node['role'].color(:yellow)}:#{node['environment'].color(:yellow)}:#{node['instance'].color(:yellow)}> #{data}"
+            puts "#{Rainbow(node['role']).yellow}:#{Rainbow(node['environment']).yellow}:#{Rainbow(node['instance']).yellow}> #{data}"
           end
 
           channel.on_extended_data do |ch,type,data|
-            puts "#{node['role'].color(:yellow)}:#{node['environment'].color(:yellow)}:#{node['instance'].color(:red)}> #{data}"
+            puts "#{Rainbow(node['role']).yellow}:#{Rainbow(node['environment']).yellow}:#{Rainbow(node['instance']).red}> #{data}"
           end
 
           channel.on_request("exit-status") do |ch,data|
@@ -148,7 +148,7 @@ module Gaptool
             nodes.each_index do |i|
               puts "#{i}: #{nodes[i]['instance']}"
             end
-            print "Select a node: ".color(:cyan)
+            print Rainbow("Select a node: ").cyan
             @ssh = $api.ssh(role, environment, nodes[$stdin.gets.chomp.to_i]['instance'])
           end
         end
@@ -315,9 +315,9 @@ module Gaptool
       if service.nil?
         keyhash = $api.svcapi_showkeys(:all)
         keyhash.keys.each do |service|
-          puts service.color(:green)
+          puts Rainbow(service).green
           keyhash[service].keys.each do |state|
-            puts "  ┖  #{state}".color(:cyan)
+            puts Rainbow("  ┖  #{state}").cyan
             keyhash[service][state].each do |key|
               puts "    - #{key}"
             end
@@ -325,9 +325,9 @@ module Gaptool
         end
       else
         keyhash = $api.svcapi_showkeys(service)
-        puts service.color(:green)
+        puts Rainbow(service).green
         keyhash.keys.each do |state|
-          puts "  ┖  #{state}".color(:cyan)
+          puts Rainbow("  ┖  #{state}").cyan
           keyhash[state].each do |key|
             puts "    - #{key}"
           end
